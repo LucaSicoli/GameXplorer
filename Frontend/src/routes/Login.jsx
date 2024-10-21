@@ -69,7 +69,7 @@ function Login() {
             Login
           </Typography>
           <TextField
-            margin="normal"
+            margin="dense" // Reduce el margen entre los campos
             required
             fullWidth
             id="email"
@@ -79,10 +79,10 @@ function Login() {
             autoFocus
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            sx={{ mb: 2 }}
+            sx={{ mb: 1 }} // Menor margen abajo
           />
           <TextField
-            margin="normal"
+            margin="dense" // Reduce el margen vertical entre los campos
             required
             fullWidth
             name="password"
@@ -92,13 +92,13 @@ function Login() {
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            sx={{ mb: 2 }}
+            sx={{ mb: 1.5 }} // Un poco de espacio antes del botón
           />
           <Button
             type="submit"
             fullWidth
             variant="contained"
-            sx={{ mb: 2 }}
+            sx={{ mt: 1.5, mb: 2 }} // Espacio arriba para separarlo del último campo
           >
             Iniciar sesión
           </Button>
@@ -114,6 +114,6 @@ function Login() {
       </Box>
     </ThemeProvider>
   );
-} 
+}
 
 export default Login;

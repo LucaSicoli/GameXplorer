@@ -3,3 +3,11 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+    background: linear-gradient(180deg, #062A56 0%, #03152B 100%);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+  }
+  

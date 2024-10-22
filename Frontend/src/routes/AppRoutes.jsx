@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import Login from "../routes/login";
+import Login from "../components/Login";
 
 const AppRoutes = () => {
   return (

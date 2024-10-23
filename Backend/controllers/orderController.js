@@ -1,36 +1,33 @@
-const Order = require('../models/order');  // Si el archivo es 'order.js'
-const Game = require('../models/Game');
+const Cart = require('../models/cart');
+const Order = require('../models/order');
 
-// Crear una nueva orden (compra de videojuego)
+// Crear una orden desde el carrito
 exports.createOrder = async (req, res) => {
-    const { gameId } = req.body;
-
     try {
-        // Buscar el videojuego
-        const game = await Game.findById(gameId);
-        if (!game) {
-            return res.status(404).json({ message: 'Videojuego no encontrado' });
-        }
+        const cart = await Cart.findOne({ user: req.user._id }).populate('items.game', 'price');
+        if (!cart) return res.status(404).json({ message: 'Carrito no encontrado.' });
 
-        // Crear una nueva orden
+        const totalPrice = cart.items.reduce((total, item) => total + item.game.price * item.quantity, 0);
+
         const order = new Order({
             user: req.user._id,
-            game: gameId,
-            price: game.price,
+            items: cart.items,
+            totalPrice,
         });
-        await order.save();
 
-        res.status(201).json(order);
+        await order.save();
+        await Cart.findByIdAndDelete(cart._id); // Vaciar el carrito
+
+        res.status(201).json({ message: 'Orden creada exitosamente.', order });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-// Obtener las órdenes del usuario autenticado
+// Obtener las órdenes del usuario
 exports.getUserOrders = async (req, res) => {
     try {
-        // Buscar todas las órdenes del usuario autenticado
-        const orders = await Order.find({ user: req.user._id }).populate('game');
+        const orders = await Order.find({ user: req.user._id }).populate('items.game', 'name price');
         res.json(orders);
     } catch (error) {
         res.status(500).json({ message: error.message });

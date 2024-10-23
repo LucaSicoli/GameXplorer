@@ -3,7 +3,7 @@ const { addToWishlist, getWishlist, removeFromWishlist } = require('../controlle
 const authMiddleware = require('../middleware/authMiddleware');
 const router = express.Router();
 
-// Ruta para obtener la wishlist
+// Ruta para obtener la wishlist del usuario autenticado
 router.get('/', authMiddleware, getWishlist);
 
 // Ruta para agregar un videojuego a la wishlist

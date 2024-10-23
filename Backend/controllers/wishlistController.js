@@ -9,29 +9,37 @@ exports.addToWishlist = async (req, res) => {
         // Buscar el juego por nombre
         const game = await Game.findOne({ name });
         if (!game) {
-            return res.status(404).json({ message: 'Videojuego no encontrado' });
+            return res.status(404).json({ message: 'Videojuego no encontrado.' });
         }
 
-        // Verificar si ya existe una wishlist para este usuario
+        // Buscar o crear la wishlist del usuario
         let wishlist = await Wishlist.findOne({ user: req.user._id });
-        
+
         if (!wishlist) {
-            // Si no existe, crear una nueva wishlist
+            // Crear una nueva wishlist si no existe
             wishlist = new Wishlist({
                 user: req.user._id,
-                games: [game._id]
+                games: [game._id],
             });
-        } else {
-            // Si ya existe, agregar el juego si no está ya en la lista
-            if (wishlist.games.includes(game._id)) {
-                return res.status(400).json({ message: 'El videojuego ya está en la wishlist' });
-            }
-            wishlist.games.push(game._id);
+            await wishlist.save();
+            return res.status(201).json({ message: `El juego '${name}' se ha agregado correctamente a la wishlist.` });
         }
 
-        // Guardar la wishlist
+        // Verificar si el juego ya está en la wishlist
+        const gameExists = wishlist.games.some(gameId => gameId.toString() === game._id.toString());
+        if (gameExists) {
+            return res.status(400).json({ message: `El juego '${name}' ya está en la wishlist.` });
+        }
+
+        // Agregar el juego a la wishlist y guardar
+        wishlist.games.push(game._id);
         await wishlist.save();
-        res.status(201).json(wishlist);
+
+        const updatedWishlist = await Wishlist.findById(wishlist._id).populate('games', 'name category imageUrl');
+        res.status(201).json({
+            message: `El juego '${name}' se ha agregado correctamente a la wishlist.`,
+            wishlist: updatedWishlist,
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -40,11 +48,10 @@ exports.addToWishlist = async (req, res) => {
 // Obtener la wishlist del usuario autenticado
 exports.getWishlist = async (req, res) => {
     try {
-        // Buscar la wishlist del usuario y popular con los detalles de los juegos
-        const wishlist = await Wishlist.findOne({ user: req.user._id }).populate('games');
+        const wishlist = await Wishlist.findOne({ user: req.user._id }).populate('games', 'name category imageUrl');
 
         if (!wishlist) {
-            return res.status(404).json({ message: 'No se encontró una wishlist para este usuario' });
+            return res.status(404).json({ message: 'No se encontró una wishlist para este usuario.' });
         }
 
         res.json(wishlist);
@@ -58,29 +65,29 @@ exports.removeFromWishlist = async (req, res) => {
     const { name } = req.body;
 
     try {
-        // Buscar el juego por nombre
         const game = await Game.findOne({ name });
         if (!game) {
-            return res.status(404).json({ message: 'Videojuego no encontrado' });
+            return res.status(404).json({ message: 'Videojuego no encontrado.' });
         }
 
-        // Buscar la wishlist del usuario
-        let wishlist = await Wishlist.findOne({ user: req.user._id });
+        const wishlist = await Wishlist.findOne({ user: req.user._id });
         if (!wishlist) {
-            return res.status(404).json({ message: 'No se encontró una wishlist para este usuario' });
+            return res.status(404).json({ message: 'No se encontró una wishlist para este usuario.' });
         }
 
-        // Verificar si el juego está en la wishlist
-        if (!wishlist.games.includes(game._id)) {
-            return res.status(404).json({ message: 'El videojuego no está en la wishlist' });
+        const gameExists = wishlist.games.some(gameId => gameId.toString() === game._id.toString());
+        if (!gameExists) {
+            return res.status(404).json({ message: `El juego '${name}' no está en la wishlist.` });
         }
 
-        // Eliminar el juego de la wishlist
         wishlist.games = wishlist.games.filter(gameId => gameId.toString() !== game._id.toString());
-
-        // Guardar la wishlist actualizada
         await wishlist.save();
-        res.json({ message: 'Videojuego eliminado de la wishlist', wishlist });
+
+        const updatedWishlist = await Wishlist.findById(wishlist._id).populate('games', 'name category imageUrl');
+        res.json({
+            message: `El juego '${name}' ha sido eliminado correctamente de la wishlist.`,
+            wishlist: updatedWishlist,
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

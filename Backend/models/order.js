@@ -6,18 +6,20 @@ const orderSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
     },
-    game: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Game',
-        required: true,
-    },
-    price: {
+    items: [
+        {
+            game: { type: mongoose.Schema.Types.ObjectId, ref: 'Game' },
+            quantity: { type: Number, required: true },
+        },
+    ],
+    totalPrice: {
         type: Number,
         required: true,
     },
-    purchasedAt: {
-        type: Date,
-        default: Date.now,
+    status: {
+        type: String,
+        enum: ['pending', 'completed', 'cancelled'],
+        default: 'pending',
     },
 }, { timestamps: true });
 

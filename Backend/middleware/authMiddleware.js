@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+// Middleware de autenticación
 const authMiddleware = async (req, res, next) => {
     const token = req.header('Authorization')?.replace('Bearer ', '');
 
@@ -16,11 +17,11 @@ const authMiddleware = async (req, res, next) => {
             return res.status(404).json({ message: 'Usuario no encontrado' });
         }
 
-        req.user = user;
-        next();  // Continúa con la siguiente función si la autenticación es correcta
+        req.user = user; // Almacenamos los datos del usuario en req.user
+        next(); // Continuar si el usuario es válido
     } catch (error) {
         res.status(401).json({ message: 'Token no válido' });
     }
 };
 
-module.exports = authMiddleware;  // Asegúrate de que está exportando la función
+module.exports = authMiddleware;

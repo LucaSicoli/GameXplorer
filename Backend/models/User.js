@@ -15,14 +15,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    role: {
-        type: String,
-        enum: ['cliente', 'empresa'],
-        default: 'cliente',
+    role: { 
+        type: String, 
+        enum: ['gamer', 'empresa'], // Definimos los roles disponibles
+        default: 'gamer', // Rol predeterminado
     }
 });
 
-// Middleware para encriptar contraseñas antes de guardar
+// Middleware para encriptar la contraseña antes de guardar
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
     const salt = await bcrypt.genSalt(10);
@@ -32,4 +32,4 @@ userSchema.pre('save', async function (next) {
 
 const User = mongoose.model('User', userSchema);
 
-module.exports = User;  // Asegúrate de exportar correctamente el modelo
+module.exports = User;

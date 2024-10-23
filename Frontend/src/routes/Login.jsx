@@ -50,7 +50,7 @@ function Login() {
         <Box sx={{ mb: 4, display: 'flex', alignItems: 'center' }}>
           <StarIcon sx={{ fontSize: 40, mr: 1, color: 'white' }} />
           <Typography variant="h4" component="h1" fontWeight="bold" color="white">
-            Mexplore
+            gameXplore
           </Typography>
         </Box>
         <Box
